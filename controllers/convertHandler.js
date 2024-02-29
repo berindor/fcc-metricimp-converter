@@ -12,26 +12,32 @@ function ConvertHandler() {
     km: { returnUnit: 'mi', spellOut: 'kilometers', convertNum: miToKm, convertOp: '/' }
   };
 
-  numInputToNumber = function (input) {
-    const divideRegex = /\//;
-    if (divideRegex.test(input)) {
-      const [num1, num2] = input.split('/');
-      return numInputToNumber(num1) / numInputToNumber(num2);
-    }
-    const numRoundedToFiveDigits = Math.round(input * 100000) / 100000;
-    return numRoundedToFiveDigits;
+  this.roundNumber = function (number) {
+    const digits = 5;
+    const roundedNum = Math.round(number * Math.pow(10, digits)) / Math.pow(10, digits);
+    return roundedNum;
   };
 
   this.getNum = function (input) {
-    const unitStartIndex = input.match(/[a-zA-Z]/).index;
-    const numString = input.slice(0, unitStartIndex);
+    let numString = input;
+    if (/[a-zA-Z]/.test(input)) {
+      const unitStartIndex = input.match(/[a-zA-Z]/).index;
+      numString = input.slice(0, unitStartIndex);
+    }
     if (numString === '') return 1;
     const numRegex = /^\d*\.?\d*\/?\d*\.?\d*$/;
     if (!numRegex.test(numString)) return 'invalid number';
-    return numInputToNumber(numString);
+    if (/\//.test(numString)) {
+      const [num1, num2] = numString.split('/');
+      return this.roundNumber(Number(num1) / Number(num2));
+    }
+    return this.roundNumber(numString);
   };
 
   this.getUnit = function (input) {
+    if (!/[a-zA-Z]/.test(input)) {
+      return 'invalid unit';
+    }
     const unitStartIndex = input.match(/[a-zA-Z]/).index;
     const unitString = input.slice(unitStartIndex).toLowerCase();
     const unitRegex = new RegExp('^(' + Object.keys(units).join('|') + ')$', 'i');
@@ -51,9 +57,9 @@ function ConvertHandler() {
   this.convert = function (initNum, initUnit) {
     switch (units[initUnit].convertOp) {
       case '*':
-        return initNum * units[initUnit].convertNum;
+        return this.roundNumber(initNum * units[initUnit].convertNum);
       case '/':
-        return initNum / units[initUnit].convertNum;
+        return this.roundNumber(initNum / units[initUnit].convertNum);
     }
   };
 
