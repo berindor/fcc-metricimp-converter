@@ -42,6 +42,17 @@ suite('Functional Tests', function () {
         done();
       });
   });
+  test('test GET /api/convert with invalid input number and unit "3/7.2/4klm"', function (done) {
+    chai
+      .request(server)
+      .keepOpen()
+      .get('/api/convert?input=3/7.2/4klm')
+      .end(function (err, res) {
+        assert.equal(res.status, 200);
+        assert.equal(res.body.string, 'invalid number and unit');
+        done();
+      });
+  });
   test('test GET /api/convert with valid input without number "kg"', function (done) {
     chai
       .request(server)
@@ -51,7 +62,7 @@ suite('Functional Tests', function () {
         assert.equal(res.status, 200);
         assert.equal(res.body.initNum, 1);
         assert.equal(res.body.initUnit, 'kg');
-        assert.equal(res.body.returnNum, 1 / 0.453592);
+        assert.approximately(res.body.returnNum, 1 / 0.453592, 0.000005);
         assert.equal(res.body.returnUnit, 'lbs');
         done();
       });

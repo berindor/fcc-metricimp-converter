@@ -12,38 +12,32 @@ function ConvertHandler() {
     km: { returnUnit: 'mi', spellOut: 'kilometers', convertNum: miToKm, convertOp: '/' }
   };
 
-  const unitEndRegex = new RegExp('(' + Object.keys(units).join('|') + ')$', 'i');
-  const NumRegex = /^\d*\.?\d*\/?\d*\.?\d*$/;
-
   numInputToNumber = function (input) {
     const divideRegex = /\//;
     if (divideRegex.test(input)) {
       const [num1, num2] = input.split('/');
       return numInputToNumber(num1) / numInputToNumber(num2);
     }
-    return Number(input);
+    const numRoundedToFiveDigits = Math.round(input * 100000) / 100000;
+    return numRoundedToFiveDigits;
   };
 
   this.getNum = function (input) {
-    const endsInValidUnit = unitEndRegex.test(input);
-    if (!endsInValidUnit) return 'invalid unit';
-    const inputWithoutUnit = input.replace(unitEndRegex, '');
-    if (inputWithoutUnit === '') return 1;
-    const isValidNumber = NumRegex.test(inputWithoutUnit);
-    if (!isValidNumber) return 'invalid number';
-    return numInputToNumber(inputWithoutUnit);
+    const unitStartIndex = input.match(/[a-zA-Z]/).index;
+    const numString = input.slice(0, unitStartIndex);
+    if (numString === '') return 1;
+    const numRegex = /^\d*\.?\d*\/?\d*\.?\d*$/;
+    if (!numRegex.test(numString)) return 'invalid number';
+    return numInputToNumber(numString);
   };
 
   this.getUnit = function (input) {
-    const endsInValidUnit = unitEndRegex.test(input);
-    if (!endsInValidUnit) return 'invalid unit';
-    const inputWithoutUnit = input.replace(unitEndRegex, '');
-    const isValidNumber = NumRegex.test(inputWithoutUnit);
-    if (!isValidNumber) return 'invalid number';
-    let unit = input.match(unitEndRegex)[0];
-    unit = unit.toLowerCase();
-    if (unit === 'l') return 'L';
-    return unit;
+    const unitStartIndex = input.match(/[a-zA-Z]/).index;
+    const unitString = input.slice(unitStartIndex).toLowerCase();
+    const unitRegex = new RegExp('^(' + Object.keys(units).join('|') + ')$', 'i');
+    if (!unitRegex.test(unitString)) return 'invalid unit';
+    if (unitString === 'l') return 'L';
+    return unitString;
   };
 
   this.getReturnUnit = function (initUnit) {
@@ -70,7 +64,7 @@ function ConvertHandler() {
     if (initUnit === 'invalid unit') {
       return 'invalid unit';
     }
-    const string = `${initNum} ${initUnit} converts to ${returnNum} ${returnUnit}`;
+    const string = `${initNum} ${this.spellOutUnit(initUnit)} converts to ${returnNum} ${this.spellOutUnit(returnUnit)}`;
     return string;
   };
 }

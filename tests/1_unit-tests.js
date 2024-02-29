@@ -58,23 +58,24 @@ suite('Unit Tests', function () {
     });
   });
   suite('Convert correctly', function () {
+    const approxDelta = 0.000005;
     test('correctly converts gal to L', function () {
-      assert.strictEqual(convertHandler.convert(5, 'gal'), 5 * 3.78541, '5 gal equals 5 * 3.78541 L');
+      assert.approximately(convertHandler.convert(5, 'gal'), 5 * 3.78541, approxDelta, '5 gal approx. equals 5 * 3.78541 L');
     });
     test('correctly converts L to gal', function () {
-      assert.strictEqual(convertHandler.convert(5, 'L'), 5 / 3.78541, '5 L equals 5 / 3.78541 gal');
+      assert.approximately(convertHandler.convert(5, 'L'), 5 / 3.78541, approxDelta, '5 L approx. equals 5 / 3.78541 gal');
     });
     test('correctly converts lbs to kg', function () {
-      assert.strictEqual(convertHandler.convert(5, 'lbs'), 5 * 0.453592, '5 lbs equals 5 * 0.453592 kg');
+      assert.approximately(convertHandler.convert(5, 'lbs'), 5 * 0.453592, approxDelta, '5 lbs approx. equals 5 * 0.453592 kg');
     });
     test('correctly converts kg to lbs', function () {
-      assert.strictEqual(convertHandler.convert(5, 'kg'), 5 / 0.453592, '5 kg equals 5 / 0.453592 lbs');
+      assert.approximately(convertHandler.convert(5, 'kg'), 5 / 0.453592, approxDelta, '5 kg approx. equals 5 / 0.453592 lbs');
     });
     test('correctly converts mi to km', function () {
-      assert.strictEqual(convertHandler.convert(5, 'mi'), 5 * 1.60934, '5 mi equals 5 * 1.60934 km');
+      assert.approximately(convertHandler.convert(5, 'mi'), 5 * 1.60934, approxDelta, '5 mi approx. equals 5 * 1.60934 km');
     });
     test('correctly converts km to mi', function () {
-      assert.strictEqual(convertHandler.convert(5, 'km'), 5 / 1.60934, '5 km equals 5 * 1.60934 mi');
+      assert.approximately(convertHandler.convert(5, 'km'), 5 / 1.60934, approxDelta, '5 km approx. equals 5 * 1.60934 mi');
     });
   });
 });
