@@ -13,7 +13,7 @@ function ConvertHandler() {
   };
 
   const unitEndRegex = new RegExp('(' + Object.keys(units).join('|') + ')$', 'i');
-  const remainsNumRegex = new RegExp('^d*.?d*/?d.?d*$');
+  const NumRegex = /^\d*\.?\d*\/?\d*\.?\d*$/;
 
   numInputToNumber = function (input) {
     const divideRegex = /\//;
@@ -21,31 +21,26 @@ function ConvertHandler() {
       const [num1, num2] = input.split('/');
       return numInputToNumber(num1) / numInputToNumber(num2);
     }
-    const dotRegex = /\./;
-    if (dotRegex.test(input)) {
-      const [num1, num2] = input.split('.');
-      const num2Arr = num2.split('');
-      return numInputToNumber(num1) + numInputToNumber(num2) * Math.pow(10, -num2Arr.length);
-    }
+    return Number(input);
   };
 
   this.getNum = function (input) {
     const endsInValidUnit = unitEndRegex.test(input);
     if (!endsInValidUnit) return 'invalid unit';
-    const remainingPart = input.replace(unitEndRegex, '');
-    if (remainingPart === '') return 1;
-    const validNumberInput = remainsNumRegex.test(remainingPart);
-    if (!validNumberInput) return 'invalid number';
-    return numInputToNumber(remainingPart);
+    const inputWithoutUnit = input.replace(unitEndRegex, '');
+    if (inputWithoutUnit === '') return 1;
+    const isValidNumber = NumRegex.test(inputWithoutUnit);
+    if (!isValidNumber) return 'invalid number';
+    return numInputToNumber(inputWithoutUnit);
   };
 
   this.getUnit = function (input) {
     const endsInValidUnit = unitEndRegex.test(input);
     if (!endsInValidUnit) return 'invalid unit';
-    const remainingPart = input.replace(unitEndRegex, '');
-    const validNumberInput = remainsNumRegex.test(remainingPart);
-    if (!validNumberInput) return 'invalid number';
-    let unit = input.match(unitEndRegex);
+    const inputWithoutUnit = input.replace(unitEndRegex, '');
+    const isValidNumber = NumRegex.test(inputWithoutUnit);
+    if (!isValidNumber) return 'invalid number';
+    let unit = input.match(unitEndRegex)[0];
     unit = unit.toLowerCase();
     if (unit === 'l') return 'L';
     return unit;
